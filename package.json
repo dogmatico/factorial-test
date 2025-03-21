@@ -1,0 +1,24 @@
+{
+  "name": "factorial-test",
+  "version": "1.0.0",
+  "description": "Demo for factorial hiring process",
+  "homepage": "https://github.com/dogmatico/factorial-test#readme",
+  "bugs": {
+    "url": "https://github.com/dogmatico/factorial-test/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dogmatico/factorial-test.git"
+  },
+  "license": "ISC",
+  "author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "nx": "20.6.2"
+  },
+  "nx": {}
+}
