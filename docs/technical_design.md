@@ -915,10 +915,38 @@ to get confident tests without requiring end-to-end testing.
 In a real-world product, load and contract testing, API specification artifacts, and CI/CD integration
 should be considered. We are keeping them out of scope for this exercise.
 
-## Future improvements
+#### Code structure and modularity
+
+This is highly dependent on the framework and language of choice. For the demo, as a proposal based
+on Express.js that supports modularity, the service will be structured as:
+
+- **Feature folders**: These will:
+  - Contain all feature-related code.
+  - Include a `README.md` explaining the feature itself.
+  - Include all feature files.
+  - Use a base setup function that takes the app instance as an argument, augmenting the base
+    functionality.
+
+- **A single business event bus**:
+  - Using Node.js `EventEmitters`, modules will be able to publish and subscribe to business events.
+    A wrapper function will manage some of the complexity, allowing listening à la Redux.
+
+## Future improvements, and open questions
+
+### Inventory
 
 To keep the exercise simple, we considered only a traditional inventory system. An improvement, at
 the cost of extra complexity in inventory management, would be to use a ledger to double-account
 movements of goods and components between stages (warehouse, reserved, factory, delivery, etc.).
 This could be used to reconstruct the full history of any component, for audit purposes, and for
 catastrophic failure recovery.
+
+### Categorization/tags
+
+The design assumes that a product category can have only a single product breakdown. This is open
+to discussion, as we can consider electrical and traditional bikes as the same category, but clearly
+they have different components (at a minimum, a motor and a battery). If we want to consider these
+kinds of cases, it is probably more flexible to add a system of tags to entities instead of adding
+one more level of depth in the entity graph. This is an easy add-on to implement as an extension of
+the proposed data model without modifying the entities, making it a clear first plugin if this were
+a true shop module.
