@@ -914,3 +914,11 @@ to get confident tests without requiring end-to-end testing.
 
 In a real-world product, load and contract testing, API specification artifacts, and CI/CD integration
 should be considered. We are keeping them out of scope for this exercise.
+
+## Future improvements
+
+To keep the exercise simple, we considered only a traditional inventory system. An improvement, at
+the cost of extra complexity in inventory management, would be to use a ledger to double-account
+movements of goods and components between stages (warehouse, reserved, factory, delivery, etc.).
+This could be used to reconstruct the full history of any component, for audit purposes, and for
+catastrophic failure recovery.
