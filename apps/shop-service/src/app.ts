@@ -8,6 +8,6 @@ export const app = express();
 setupSharedFunctionatily(app);
 setupInitSessionManagement(app);
 
-app.get('/', (req, res) => {
-	res.send({ message: 'Hello API' });
+app.get('/', (_req, res) => {
+	res.send({ message: 'Ready' });
 });
