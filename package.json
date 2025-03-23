@@ -12,13 +12,14 @@
   },
   "license": "ISC",
   "author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
-  "type": "commonjs",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "workspaces": [
+    "apps/*"
+  ],
+  "packageManager": "yarn@4.7.0",
   "devDependencies": {
-    "nx": "20.6.2"
-  },
-  "nx": {}
+    "@biomejs/biome": "1.9.4"
+  }
 }
