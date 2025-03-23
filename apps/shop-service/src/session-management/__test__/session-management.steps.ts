@@ -57,7 +57,7 @@ Then(
 		const requestResult = await world.data.request;
 
 		const csrfCookie = Object.values(requestResult.headers['set-cookie']).find(
-			(val) => val.startsWith('csrf-cookie-to-header='),
+			(val) => val.startsWith('X-CSRF-TOKEN='),
 		);
 		expect(csrfCookie).toBeDefined();
 		expect(csrfCookie).not.toContain('httponly');
@@ -79,7 +79,7 @@ Given('a consumer with session credentials', async (world: WorldWithData) => {
 		if (
 			curr.startsWith('session=') ||
 			curr.startsWith('session.sig=') ||
-			curr.startsWith('csrf-cookie-to-header=')
+			curr.startsWith('X-CSRF-TOKEN=')
 		) {
 			acum.push(curr.split(';')[0]);
 		}

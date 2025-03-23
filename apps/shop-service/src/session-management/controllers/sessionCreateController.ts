@@ -7,7 +7,7 @@ export function sessionCreateController(req: Request, res: Response) {
 	if (req.session && !req.session?.userId) {
 		req.session.userId = globalThis.crypto.randomUUID();
 
-		res.cookie('csrf-cookie-to-header', globalThis.crypto.randomUUID(), {
+		res.cookie('X-CSRF-TOKEN', globalThis.crypto.randomUUID(), {
 			maxAge: 10 * 60 * 1000,
 		});
 

@@ -7,7 +7,7 @@ export function sessionDeleteController(req: Request, res: Response) {
 	const userId = req.session?.userId;
 
 	req.session = null;
-	res.clearCookie('csrf-cookie-to-header');
+	res.clearCookie('X-CSRF-TOKEN');
 
 	if (userId) {
 		dispatchBusinessEvent(makeUserLoggedOutEvent({ userId: userId }));
