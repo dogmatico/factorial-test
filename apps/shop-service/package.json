@@ -1,0 +1,29 @@
+{
+	"name": "shop-service",
+	"version": "1.0.0",
+	"description": "Service handling the case studio",
+	"license": "ISC",
+	"type": "module",
+	"main": "index.ts",
+	"author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
+	"dependencies": {
+		"express": "5.0.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/express": "5.0.1",
+		"@types/node": "22.13.11",
+		"@types/supertest": "6.0.2",
+		"cookie-session": "2.1.0",
+		"quickpickle": "1.6.2",
+		"supertest": "7.1.0",
+		"typescript": "5.8.2",
+		"vitest": "3.0.9"
+	},
+	"scripts": {
+		"start": "node --experimental-strip-types ./index.ts",
+		"test": "vitest",
+		"lint": "biome lint",
+		"format": "biome format"
+	}
+}
