@@ -1,11 +1,20 @@
-import { app } from './src/app.ts';
-
 // augmentations
 import './src/augmentations.ts';
+
+import { preloadData } from './src/preloadData.ts';
+import { getDBConnection } from './src/shared/connections/database.ts';
+// import { productCategory } from "./src/product-management/models/index.ts";
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-app.listen(port, host, () => {
+// Preload data when in memory
+if (!process.env.DATABASE_CONNECTION) {
+	await preloadData();
+}
+
+const { app } = await import('./src/app.ts');
+
+app.listen(port, host, async () => {
 	console.log(`[ ready ] http://${host}:${port}`);
 });

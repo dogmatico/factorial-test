@@ -1,6 +1,6 @@
+import { Given, type QuickPickleWorld, Then, When } from 'quickpickle';
 import supertest, { type Test } from 'supertest';
 import { expect, vi } from 'vitest';
-import { Given, Then, When, type QuickPickleWorld } from 'quickpickle';
 import { app } from '../../app';
 import { registerBusinessEventHandler } from '../../shared/business-events-bus';
 import type { BusinessEventHandler } from '../../shared/business-events-bus/interfaces';

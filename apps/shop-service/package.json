@@ -7,6 +7,9 @@
 	"main": "index.ts",
 	"author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
 	"dependencies": {
+		"better-sqlite3": "11.9.1",
+		"cookie-session": "2.1.0",
+		"drizzle-orm": "0.41.0",
 		"express": "5.0.1"
 	},
 	"devDependencies": {
@@ -14,16 +17,17 @@
 		"@types/express": "5.0.1",
 		"@types/node": "22.13.11",
 		"@types/supertest": "6.0.2",
-		"cookie-session": "2.1.0",
+		"drizzle-kit": "0.30.6",
 		"quickpickle": "1.6.2",
 		"supertest": "7.1.0",
 		"typescript": "5.8.2",
 		"vitest": "3.0.9"
 	},
 	"scripts": {
-		"start": "node --experimental-strip-types ./index.ts",
+		"start": "node --experimental-transform-types ./index.ts",
 		"test": "vitest",
 		"lint": "biome lint",
-		"format": "biome format"
+		"format": "biome format",
+		"biome": "biome"
 	}
 }
