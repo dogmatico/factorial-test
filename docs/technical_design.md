@@ -620,32 +620,32 @@ involving multiple entities. This matches the common Entity/Manager or Repositor
 In this section we define the base business entities
 
 ```sql
-CREATE TABLE product_category {
-  id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE product_category (
+  id INT PRIMARY KEY AUTOINCREMENT,
   -- This unique is to use it on the view, to produce good looking URL without a lookup
   name VARCHAR(256) UNIQUE NOT NULL,
   description TEXT,
   is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   display_order INT NOT NULL DEFAULT 0
-}
+);
 
 CREATE INDEX product_category_created_at_idx ON product_category(created_at);
 
 -- To provide the view for the main product page
-CREATE INDEX product_category_order_is_enabled_idx ON product_category(display_order, is_enabled)
+CREATE INDEX product_category_order_is_enabled_idx ON product_category(display_order, is_enabled);
 ```
 
 ```sql
-CREATE TABLE product_component {
-  id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE product_component (
+  id INT PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(256) UNIQUE NOT NULL,
-  description TEXT
+  description TEXT,
 
   -- Logic to soft delete. Hard delete can cause data loss and inconsistencies with orders and
-  -- inventaries
-  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-}
+  -- inventories
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE
+);
 ```
 
 ```sql
@@ -655,76 +655,71 @@ CREATE TABLE product_category_component (
   product_category_id INT NOT NULL,
   product_component_id INT NOT NULL,
   quantity INT CHECK (quantity >= 1),
-
   PRIMARY KEY (product_category_id, product_component_id),
 
-  -- We can remove part of this if data cardinality was higher to remove contrains on the database
+  -- We can remove part of this if data cardinality was higher to remove constraints on the database
   FOREIGN KEY (product_category_id) REFERENCES product_category(id) ON DELETE CASCADE,
   FOREIGN KEY (product_component_id) REFERENCES product_component(id) ON DELETE CASCADE
-);
+) WITHOUT ROWID;
 
 CREATE INDEX product_category_component_product_component_id_idx ON product_category_component(product_component_id);
 ```
 
 ```sql
-CREATE TABLE product_component_option {
-  id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE product_component_option (
+  id INT PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(256) UNIQUE NOT NULL,
   description TEXT,
 
-  -- Priorize over delete to prevent cascade loss of data
-  is_active BOOLEAN NOT NULL DEFAULT TRUE
+  -- Prioritize over delete to prevent cascade loss of data
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
   -- One to many relation
   product_component_id INT NOT NULL,
 
   -- Storing four decimals, as top is three plus 1
   base_price DECIMAL(10, 4) NOT NULL CHECK (base_price >= 0),
-
   FOREIGN KEY (product_component_id) REFERENCES product_component(id) ON DELETE CASCADE
-}
+);
 
 CREATE INDEX product_component_option_product_component_id_idx ON product_component_option(product_component_id);
 ```
 
 ```sql
-CREATE TABLE product_component_option_rule {
-  id INT PRIMARY KEY AUTO_INCREMENT,
-
-  -- We could use a enum, but that can produce another table if not supported natively by the SQL engine
-  kind VARCHAR(256) NOT NULL CHECK (kind in ('SUPLEMENT' | 'FORBIDDEN')),
-
+CREATE TABLE product_component_option_rule (
+  id INT PRIMARY KEY AUTOINCREMENT,
+  product_component_option_id_1 INT NOT NULL,
+  product_component_option_id_2 INT NOT NULL,
+  -- We could use an enum, but that can produce another table if not supported natively by the SQL engine
+  kind VARCHAR(256) NOT NULL CHECK (kind IN ('SUPLEMENT', 'FORBIDDEN')),
   -- Consumer will cast it depending on the kind
   rule_value TEXT,
 
   FOREIGN KEY (product_component_option_id_1) REFERENCES product_component_option(id) ON DELETE CASCADE,
   FOREIGN KEY (product_component_option_id_2) REFERENCES product_component_option(id) ON DELETE CASCADE,
-
   -- This with the unique index will ensure no duplicate rules of the same kind, plus rules on itself
   CONSTRAINT check_ordering CHECK (product_component_option_id_1 < product_component_option_id_2)
-}
+);
 
 CREATE UNIQUE INDEX product_component_option_rule_parents_idx
   ON product_component_option_rule(product_component_option_id_1, product_component_option_id_2, kind);
 ```
 
 ```sql
-CREATE TABLE product_configuration {
-  id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE product_configuration (
+  id INT PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(256),
   description TEXT,
-
   product_component_id INT NOT NULL,
+
   -- We can use it to differentiate customer from base configuration without duplicating tables
-  order_id INT NULL,
+  is_base_configuration BOOLEAN NOT NULL DEFAULT FALSE,
 
   FOREIGN KEY (product_component_id) REFERENCES product_component(id) ON DELETE CASCADE
-  -- Do not delete or set null, it should be keep
-  FOREIGN KEY (order_id) REFERENCES orders(id)
-}
+);
 
 -- Many to many relation
-CREATE TABLE product_configuration_component_option {
+CREATE TABLE product_configuration_component_option (
   product_configuration_id INT NOT NULL,
   product_component_option_id INT NOT NULL,
   quantity INT CHECK (quantity >= 1),
@@ -732,7 +727,7 @@ CREATE TABLE product_configuration_component_option {
   PRIMARY KEY (product_configuration_id, product_component_option_id),
   FOREIGN KEY (product_configuration_id) REFERENCES product_configuration(id) ON DELETE CASCADE,
   FOREIGN KEY (product_component_option_id) REFERENCES product_component_option(id) ON DELETE CASCADE
-}
+) WITHOUT ROWID;
 ```
 
 ###### Inventory management and soft lock on timeout plus overbooking
@@ -751,28 +746,29 @@ the overbooking parameter per component option (which might be desirable for hig
 launch events), this is out of scope for now.
 
 ```sql
-CREATE TABLE inventory {
+CREATE TABLE inventory (
   product_component_option_id INT NOT NULL,
   total_stock INT NOT NULL CHECK (total_stock >= 0),
 
   PRIMARY KEY (product_component_option_id),
   FOREIGN KEY (product_component_option_id) REFERENCES product_component_option(id)
-}
+);
 
-CREATE TABLE inventory_reservation {
-  session_id INT NOT NULL
-
+CREATE TABLE inventory_reservation (
+  session_id INT NOT NULL,
   product_component_option_id INT NOT NULL,
   reserved_units INT NOT NULL CHECK (reserved_units >= 0),
-
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  expires_at TIMESTAMP NOT NULL
+  expires_at TIMESTAMP NOT NULL,
 
   PRIMARY KEY (session_id, product_component_option_id),
-  -- Can be safely delete, it is all transient data
+
+  -- Can be safely deleted, it is all transient data
   FOREIGN KEY (product_component_option_id) REFERENCES product_component_option(id) ON DELETE CASCADE
-  FOREIGN KEY (session_id) REFERENCES user_session(id) ON DELETE CASCADE
-}
+
+  -- We are not storing real session data on tables, is all in-memory for demo purposes
+  -- FOREIGN KEY (session_id) REFERENCES user_session(id) ON DELETE CASCADE
+);
 
 -- To remove expired data and get available inventory
 CREATE INDEX expires_at_idx ON inventory_reservation(expires_at);
@@ -783,16 +779,16 @@ virtual. For now, we use a virtual view with a default 10% overbooking:
 
 ```sql
 CREATE VIEW available_inventory AS
-SELECT
-  inv_real.product_component_option_id,
-  -- Apply a default 10% overbooking
-  FLOOR(1.10 * (inv_real.total_stock - COALESCE(SUM(inv_reserved.reserved_units), 0))) as total_stock,
-  -- Consider the product_category_id to send less data and save prevent application layer filtering
-  pc.product_category_id
+  SELECT
+    inv_real.product_component_option_id,
+    -- Apply a default 10% overbooking
+    FLOOR(1.10 * (inv_real.total_stock - COALESCE(SUM(inv_reserved.reserved_units), 0))) as total_stock,
+    -- Consider the product_category_id to send less data and save prevent application layer filtering
+    pc.product_category_id
   FROM inventory inv_real
   LEFT JOIN inventory_reservation inv_reserved ON (
     inv_real.product_component_option_id = inv_reserved.product_component_option_id
-    AND inv_reserved.expires_at > NOW()
+    AND inv_reserved.expires_at > datetime('now')
   )
   JOIN product_component_option pco ON inv_real.product_component_option_id = pco.id
   JOIN product_component pc ON pco.product_component_id = pc.id
@@ -810,34 +806,33 @@ ensure data integrity and system stability.
 Orders are defined as
 
 ```sql
-CREATE TABLE customer_order {
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    -- We are not considering in this exercise customer registration
-    -- The service layer will use the session id as such. That means that we won't be adding a
-    -- FOREIGN KEY. We will index it just to help
-    customer_id INT NOT NULL,
+CREATE TABLE customer_order (
+  id INT PRIMARY KEY AUTOINCREMENT,
+  -- We are not considering in this exercise customer registration
+  -- The service layer will use the session id as such. That means that we won't be adding a
+  -- FOREIGN KEY. We will index it just to help
+  customer_id INT NOT NULL,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP,
 
-    -- As in other cases, we use a contrain status to make it more portable
-    order_status VARCHAR(256) NOT NULL CHECK (kind in ('SESSION_ON_GOING' | 'COMPLETED' | 'CANCELLED')),
+  -- As in other cases, we use a constraint status to make it more portable
+  order_status VARCHAR(256) NOT NULL CHECK (order_status IN ('SESSION_ON_GOING', 'COMPLETED', 'CANCELLED')),
+  total_price DECIMAL(10, 4)
+);
 
-    total_price DECIMAL(10, 4)
-}
 CREATE INDEX customer_order_customer_id ON customer_order(customer_id);
 
 -- Codify Many to Many
-CREATE TABLE customer_order_configuration {
+CREATE TABLE customer_order_configuration (
   customer_order_id INT NOT NULL,
   product_configuration_id INT NOT NULL,
-
   purchased_count INT NOT NULL CHECK (purchased_count >= 0),
 
   PRIMARY KEY (customer_order_id, product_configuration_id),
-  FOREIGN KEY (customer_order_id) REFERENCES customer_order(id)
+  FOREIGN KEY (customer_order_id) REFERENCES customer_order(id),
   FOREIGN KEY (product_configuration_id) REFERENCES product_configuration(id)
-}
+) WITHOUT ROWID;
 
 CREATE INDEX customer_order_configuration_product_configuration_id_idx ON customer_order_configuration(product_configuration_id);
 ```
@@ -921,6 +916,7 @@ This is highly dependent on the framework and language of choice. For the demo, 
 on Express.js that supports modularity, the service will be structured as:
 
 - **Feature folders**: These will:
+
   - Contain all feature-related code.
   - Include a `README.md` explaining the feature itself.
   - Include all feature files.

@@ -1,5 +1,5 @@
-import type { Express } from 'express';
 import cookieSession from 'cookie-session';
+import type { Express } from 'express';
 
 import { setupSessionManagementControllers } from './controllers/setup.ts';
 
