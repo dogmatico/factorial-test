@@ -46,12 +46,12 @@ INSERT INTO product_component_option (product_component_id, name, base_price) VA
 -- CATEGORY-COMPONENT RELATIONSHIP
 
 -- All components belong to Bicycles category
-INSERT INTO product_category_component (product_category_id, product_component_id, quantity) VALUES
-  (1, 1, 1),
-  (1, 2, 1),
-  (1, 3, 1),
-  (1, 4, 1),
-  (1, 5, 1);
+INSERT INTO product_category_component (product_category_id, product_component_id, quantity, display_order) VALUES
+  (1, 1, 1, 1),
+  (1, 2, 1, 2),
+  (1, 3, 1, 3),
+  (1, 4, 1, 4),
+  (1, 5, 1, 5);
 
 -- INVENTORY
 
@@ -62,19 +62,15 @@ INSERT INTO inventory (product_component_option_id, total_stock) VALUES
   (9, 0), (10, 25), (11, 25),  -- Rim colors (red out of stock)
   (12, 30), (13, 30);          -- Chains
 
--- COMPATBILITY/SUPLEMENTS
+-- COMPATBILITY/SUPPLEMENTS
 
--- 1. Mountain wheels require full-suspension frame
-INSERT INTO product_component_option_rule (product_component_option_id_1, product_component_option_id_2, kind, rule_value) VALUES
-(1, 7, 'FORBIDDEN', '{"message":"Mountain wheels require full-suspension frame","inverse":true}');
-
--- 2. Fat bike wheels cannot have red rims
+-- 1 Fat bike wheels cannot have red rims
 INSERT INTO product_component_option_rule (product_component_option_id_1, product_component_option_id_2, kind, rule_value) VALUES
 (8, 9, 'FORBIDDEN', '{"message":"Fat bike wheels cannot have red rims"}');
 
--- 3. Matte finish price supplement for full-suspension (+15 EUR)
+-- 2. Matte finish price supplement for full-suspension (+15 EUR)
 INSERT INTO product_component_option_rule (product_component_option_id_1, product_component_option_id_2, kind, rule_value) VALUES
-(1, 4, 'SUPLEMENT', '{"price_adjustment":15.00,"message":"Matte finish supplement for full-suspension frames"}');
+(1, 4, 'SUPPLEMENT', '{"price_adjustment":15.00,"message":"Matte finish supplement for full-suspension frames"}');
 
 
 -- SAMPLE BASE CONFIG

@@ -55,6 +55,7 @@ export const productCategoryComponent = sqliteTable(
 			.notNull()
 			.references(() => productComponent.id, { onDelete: 'cascade' }),
 		quantity: integer('quantity').notNull(),
+		displayOrder: integer('display_order').notNull().default(0),
 	},
 	(table) => [
 		primaryKey({
@@ -62,6 +63,11 @@ export const productCategoryComponent = sqliteTable(
 		}),
 		index('product_category_component_product_component_id_idx').on(
 			table.productComponentId,
+		),
+		index('product_category_component_product_component_display_order_idx').on(
+			table.productCategoryId,
+			table.productComponentId,
+			table.displayOrder,
 		),
 		check('quantity_check', sql`${table.quantity} >= 1`),
 	],
@@ -108,7 +114,7 @@ export const productComponentOptionRule = sqliteTable(
 			table.productComponentOptionId2,
 			table.kind,
 		),
-		check('kind_check', sql`${table.kind} IN ('SUPLEMENT', 'FORBIDDEN')`),
+		check('kind_check', sql`${table.kind} IN ('SUPPLEMENT', 'FORBIDDEN')`),
 		check(
 			'check_ordering',
 			sql`CHECK (${table.productComponentOptionId1} < ${table.productComponentOptionId2})`,
