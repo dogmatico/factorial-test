@@ -1095,6 +1095,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/better-sqlite3@npm:7.6.12":
+  version: 7.6.12
+  resolution: "@types/better-sqlite3@npm:7.6.12"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/5367de7492e2c697aa20cc4024ba26210971d15f60c01ef691eddfbbfd39ccf9f80d5129fd7fd6c76c98804739325e23d2b156b0eac8f5a7665ba374a08ac1e7
+  languageName: node
+  linkType: hard
+
 "@types/body-parser@npm:*":
   version: 1.19.5
   resolution: "@types/body-parser@npm:1.19.5"
@@ -4005,6 +4014,7 @@ __metadata:
   resolution: "shop-service@workspace:apps/shop-service"
   dependencies:
     "@biomejs/biome": "npm:1.9.4"
+    "@types/better-sqlite3": "npm:7.6.12"
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:22.13.11"
     "@types/supertest": "npm:6.0.2"

@@ -691,7 +691,7 @@ CREATE TABLE product_component_option_rule (
   product_component_option_id_1 INT NOT NULL,
   product_component_option_id_2 INT NOT NULL,
   -- We could use an enum, but that can produce another table if not supported natively by the SQL engine
-  kind VARCHAR(256) NOT NULL CHECK (kind IN ('SUPLEMENT', 'FORBIDDEN')),
+  kind VARCHAR(256) NOT NULL CHECK (kind IN ('SUPPLEMENT', 'FORBIDDEN')),
   -- Consumer will cast it depending on the kind
   rule_value TEXT,
 

@@ -33,13 +33,19 @@ CREATE TABLE product_category_component (
   product_category_id INT NOT NULL,
   product_component_id INT NOT NULL,
   quantity INT CHECK (quantity >= 1),
+
+  display_order INT NOT NULL DEFAULT 0,
+
   PRIMARY KEY (product_category_id, product_component_id),
   -- We can remove part of this if data cardinality was higher to remove constraints on the database
   FOREIGN KEY (product_category_id) REFERENCES product_category(id) ON DELETE CASCADE,
   FOREIGN KEY (product_component_id) REFERENCES product_component(id) ON DELETE CASCADE
 ) WITHOUT ROWID;
 
+CREATE INDEX product_category_component_product_component_display_order_idx ON product_category_component(product_category_id, product_component_id, display_order);
+CREATE INDEX product_category_component_product_component_display_order_idx_2 ON product_category_component(display_order, product_component_id, product_category_id);
 CREATE INDEX product_category_component_product_component_id_idx ON product_category_component(product_component_id);
+CREATE INDEX product_category_component_order_optimized_idx ON product_category_component(product_category_id, display_order, product_component_id);
 
 CREATE TABLE product_component_option (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,7 +70,7 @@ CREATE TABLE product_component_option_rule (
   product_component_option_id_1 INT NOT NULL,
   product_component_option_id_2 INT NOT NULL,
   -- We could use an enum, but that can produce another table if not supported natively by the SQL engine
-  kind VARCHAR(256) NOT NULL CHECK (kind IN ('SUPLEMENT', 'FORBIDDEN')),
+  kind VARCHAR(256) NOT NULL CHECK (kind IN ('SUPPLEMENT', 'FORBIDDEN')),
   -- Consumer will cast it depending on the kind
   rule_value TEXT,
   FOREIGN KEY (product_component_option_id_1) REFERENCES product_component_option(id) ON DELETE CASCADE,
