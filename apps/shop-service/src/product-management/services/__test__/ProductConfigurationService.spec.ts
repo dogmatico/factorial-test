@@ -4,6 +4,7 @@ import {
 	dropNativeDatabase,
 	getDBConnection,
 } from '../../../shared/connections/database';
+import { makeGlobalId } from '../../utils/global-ids';
 import { ProductConfigurationService } from '../ProductConfigurationService';
 import { bycicleConfigurationWithSeedData } from './__fixtures__/bycicleConfigurationWithSeedData';
 import {
@@ -45,7 +46,7 @@ describe('ProductConfigurationService', () => {
 	});
 
 	describe('avaluateProductConfigurationBreakdown', () => {
-		const bycicleProductId = { id: '1' };
+		const bycicleProductId = { id: makeGlobalId('ProductCategory', '1') };
 
 		test('should return the price for a valid product breakdown without supplements', async () => {
 			const result = await service.avaluateProductConfigurationBreakdown(

@@ -113,7 +113,10 @@ When('the consumer closes the session', async (world: WorldWithData) => {
 
 Then('a user logged-in event is emitted', (world: WorldWithData) => {
 	expect(world.data.businessEventHandler).toHaveBeenCalledWith({
-		event: makeUserLoggedInEvent({ userId: expect.any(String) }),
+		event: makeUserLoggedInEvent({
+			userId: expect.any(String),
+			sessionId: expect.any(String),
+		}),
 	});
 });
 
