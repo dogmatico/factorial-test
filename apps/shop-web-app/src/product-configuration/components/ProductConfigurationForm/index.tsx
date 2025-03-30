@@ -1,6 +1,6 @@
-import type {
-	CategoryConfigurationRules,
-	Component as ProductComponent,
+import {
+	type CategoryConfigurationRules,
+	ProductBreakdownValidator,
 } from 'product-management-interfaces';
 import React, { memo, useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -49,6 +49,10 @@ export const CategoryProductConfiguration = memo(
 			}
 		}, [methods.getValues, _onChange]);
 
+		const validator = useMemo(() => {
+			return new ProductBreakdownValidator(configuration, { sortRules: true });
+		}, [configuration]);
+
 		return (
 			<FormProvider {...methods}>
 				<form
@@ -63,6 +67,7 @@ export const CategoryProductConfiguration = memo(
 								key={componentId}
 								componentId={componentId}
 								configuration={configuration}
+								validator={validator}
 							/>
 						);
 					})}

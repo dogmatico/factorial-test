@@ -18,10 +18,7 @@ export const ProductConfigurationPage = memo(function ProductConfigurationPage({
 					<div>{configuration.category.description}</div>
 				</section>
 				<section className="shop-configuration-page-section--config-form">
-					<CategoryProductConfiguration
-						configuration={configuration}
-						onChange={console.log}
-					/>
+					<CategoryProductConfiguration configuration={configuration} />
 				</section>
 			</main>
 			<ProductConfigurationActionBar />
