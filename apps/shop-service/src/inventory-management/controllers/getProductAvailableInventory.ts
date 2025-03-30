@@ -1,6 +1,6 @@
+import type { APIResponse } from 'base-api-interfaces';
 import type { Request, Response } from 'express';
 
-import type { APIResponse } from '../../shared/interfaces.ts';
 import { getInventoryManagementService } from '../services/InventoryManagement.ts';
 
 export async function getProductAvailableInventory(
