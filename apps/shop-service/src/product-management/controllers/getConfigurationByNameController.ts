@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
 
-import type { APIResponse } from '../../shared/interfaces.ts';
-import type { CategoryConfigurationRules } from '../interfaces.ts';
+import type { APIResponse } from 'base-api-interfaces';
+import type { CategoryConfigurationRules } from 'product-management-interfaces';
+
 import { getProductConfigurationService } from '../services/ProductConfigurationService.ts';
 
 export async function getConfigurationByNameController(

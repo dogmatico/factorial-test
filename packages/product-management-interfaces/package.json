@@ -1,7 +1,7 @@
 {
-	"name": "shop-service",
+	"name": "product-management-interfaces",
 	"version": "1.0.0",
-	"description": "Service handling the case studio",
+	"description": "Shared product management interfaces and tooling",
 	"license": "ISC",
 	"type": "module",
 	"main": "index.ts",
@@ -9,26 +9,16 @@
 	"dependencies": {
 		"better-sqlite3": "11.9.1",
 		"cookie-session": "2.1.0",
-		"cors": "2.8.5",
 		"drizzle-orm": "0.41.0",
-		"express": "5.0.1",
-		"product-management-interfaces": "1.0.0"
+		"express": "5.0.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@types/better-sqlite3": "7.6.12",
-		"@types/cors": "2.8.17",
-		"@types/express": "5.0.1",
 		"@types/node": "22.13.11",
-		"@types/supertest": "6.0.2",
-		"drizzle-kit": "0.30.6",
-		"quickpickle": "1.6.2",
-		"supertest": "7.1.0",
 		"typescript": "5.8.2",
 		"vitest": "3.0.9"
 	},
 	"scripts": {
-		"start": "node --experimental-transform-types ./index.ts",
 		"test": "vitest",
 		"lint": "biome lint",
 		"format": "biome format",

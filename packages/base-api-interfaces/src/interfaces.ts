@@ -1,4 +1,4 @@
-interface APIError {
+export interface APIError {
 	/**
 	 * Code for programmatic handling
 	 */

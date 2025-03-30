@@ -1,0 +1,44 @@
+{
+	"name": "shop-web-app",
+	"version": "1.0.0",
+	"description": "Web page handling the case studio",
+	"license": "ISC",
+	"type": "module",
+	"main": "index.ts",
+	"author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
+	"dependencies": {
+		"@tanstack/react-router": "^1.97.17",
+		"@tanstack/router-devtools": "^1.97.17",
+		"base-api-interfaces": "1.0.0",
+		"product-management-interfaces": "1.0.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-hook-form": "7.55.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@tanstack/router-plugin": "^1.97.17",
+		"@testing-library/dom": "10.4.0",
+		"@testing-library/jest-dom": "6.6.3",
+		"@testing-library/react": "16.2.0",
+		"@testing-library/user-event": "14.6.1",
+		"@types/react": "^18.3.3",
+		"@types/react-dom": "^18.3.0",
+		"@vitejs/plugin-react": "^4.3.2",
+		"jsdom": "^26.0.0",
+		"msw": "2.7.0",
+		"typescript": "5.8.2",
+		"vite": "^6.2.3",
+		"vitest": "3.0.9"
+	},
+	"private": true,
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"dev": "vite --port=3001",
+		"build": "vite build",
+		"serve": "vite preview",
+		"start": "vite",
+		"test": "vitest",
+		"biome": "biome"
+	}
+}

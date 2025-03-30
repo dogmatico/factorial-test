@@ -1,6 +1,13 @@
+import { createFileRoute } from '@tanstack/react-router';
 import type { CategoryConfigurationRules } from 'product-management-interfaces';
+import React from 'react';
+import { CategoryProductConfiguration } from '../product-configuration/components/ProductConfigurationForm';
 
-export const bycicleConfigurationWithSeedData: CategoryConfigurationRules = {
+export const Route = createFileRoute('/')({
+	component: RouteComponent,
+});
+
+const configuration: CategoryConfigurationRules = {
 	category: {
 		id: '1',
 		name: 'Bicycles',
@@ -146,3 +153,7 @@ export const bycicleConfigurationWithSeedData: CategoryConfigurationRules = {
 		},
 	],
 };
+
+function RouteComponent() {
+	return <h1>Welcome to Marcus hardware</h1>;
+}
