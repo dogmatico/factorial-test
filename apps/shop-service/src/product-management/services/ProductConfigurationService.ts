@@ -17,6 +17,7 @@ import {
 	productComponentOption,
 	productComponentOptionRule,
 } from '../models/index.ts';
+import { makeGlobalId } from '../utils/global-ids.ts';
 
 export type ProductCategoryIdentifier = Partial<{
 	id: string;
@@ -100,7 +101,10 @@ export class ProductConfigurationService {
 					product_component_option_rule,
 				} = row;
 
-				const productComponentId = product_component.id.toString();
+				const productComponentId = makeGlobalId(
+					'ProductComponent',
+					product_component.id.toString(),
+				);
 				if (!result.components[productComponentId]) {
 					result.category.productBreakDown.push(productComponentId);
 
@@ -113,7 +117,10 @@ export class ProductConfigurationService {
 					};
 				}
 
-				const productComponentOptionId = product_component_option.id.toString();
+				const productComponentOptionId = makeGlobalId(
+					'ComponentOption',
+					product_component_option.id.toString(),
+				);
 				if (!result.componentOptions[productComponentOptionId]) {
 					result.componentOptions[productComponentOptionId] = {
 						id: productComponentOptionId,
@@ -127,7 +134,12 @@ export class ProductConfigurationService {
 					);
 				}
 
-				const ruleId = product_component_option_rule?.id.toString();
+				const ruleId = product_component_option_rule?.id
+					? makeGlobalId(
+							'ProductComponentRule',
+							product_component_option_rule.id.toString(),
+						)
+					: null;
 				if (
 					product_component_option_rule &&
 					ruleId &&
@@ -135,10 +147,14 @@ export class ProductConfigurationService {
 				) {
 					result.componentOptionsRules.push({
 						id: ruleId,
-						option1Id:
+						option1Id: makeGlobalId(
+							'ComponentOption',
 							product_component_option_rule.productComponentOptionId1.toString(),
-						option2Id:
+						),
+						option2Id: makeGlobalId(
+							'ComponentOption',
 							product_component_option_rule.productComponentOptionId2.toString(),
+						),
 						kind: product_component_option_rule.kind as ComponentOptionsRule['kind'],
 						value: JSON.parse(product_component_option_rule.ruleValue ?? '{}'),
 					});
