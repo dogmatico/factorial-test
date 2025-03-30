@@ -2,8 +2,6 @@
 import './src/augmentations.ts';
 
 import { preloadData } from './src/preloadData.ts';
-import { getDBConnection } from './src/shared/connections/database.ts';
-// import { productCategory } from "./src/product-management/models/index.ts";
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;

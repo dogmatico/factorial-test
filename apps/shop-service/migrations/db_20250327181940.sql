@@ -136,7 +136,7 @@ SELECT
   -- Apply a default 10% overbooking
   FLOOR(1.10 * (inv_real.total_stock - COALESCE(SUM(inv_reserved.reserved_units), 0))) as total_stock,
   -- Consider the product_category_id to send less data and save prevent application layer filtering
-  pc.product_category_id
+  pc.id
 FROM inventory inv_real
 LEFT JOIN inventory_reservation inv_reserved ON (
   inv_real.product_component_option_id = inv_reserved.product_component_option_id
@@ -145,7 +145,7 @@ LEFT JOIN inventory_reservation inv_reserved ON (
 JOIN product_component_option pco ON inv_real.product_component_option_id = pco.id
 JOIN product_component pc ON pco.product_component_id = pc.id
 JOIN product_category_component pcc ON pc.id = pcc.product_component_id
-GROUP BY inv_real.product_component_option_id, inv_real.total_stock, pc.product_category_id;
+GROUP BY inv_real.product_component_option_id, inv_real.total_stock, pc.id;
 
 CREATE TABLE customer_order (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
