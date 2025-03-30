@@ -1,0 +1,27 @@
+{
+	"name": "product-management-interfaces",
+	"version": "1.0.0",
+	"description": "Shared product management interfaces and tooling",
+	"license": "ISC",
+	"type": "module",
+	"main": "index.ts",
+	"author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
+	"dependencies": {
+		"better-sqlite3": "11.9.1",
+		"cookie-session": "2.1.0",
+		"drizzle-orm": "0.41.0",
+		"express": "5.0.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "22.13.11",
+		"typescript": "5.8.2",
+		"vitest": "3.0.9"
+	},
+	"scripts": {
+		"test": "vitest",
+		"lint": "biome lint",
+		"format": "biome format",
+		"biome": "biome"
+	}
+}
