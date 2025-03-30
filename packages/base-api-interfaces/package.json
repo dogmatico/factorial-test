@@ -1,0 +1,21 @@
+{
+	"name": "base-api-interfaces",
+	"version": "1.0.0",
+	"description": "Shared api interfaces and tooling",
+	"license": "ISC",
+	"type": "module",
+	"main": "index.ts",
+	"author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "22.13.11",
+		"typescript": "5.8.2",
+		"vitest": "3.0.9"
+	},
+	"scripts": {
+		"test": "vitest",
+		"lint": "biome lint",
+		"format": "biome format",
+		"biome": "biome"
+	}
+}
