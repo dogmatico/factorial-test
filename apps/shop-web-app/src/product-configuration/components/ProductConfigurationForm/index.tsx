@@ -2,9 +2,12 @@ import {
 	type CategoryConfigurationRules,
 	ProductBreakdownValidator,
 } from 'product-management-interfaces';
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { ProductConfigurationActionBarExtraActionWrapper } from '../ProductConfigurationActionBar';
 import { CategoryConfigurationComponentSection } from './CategoryConfigurationComponentSection';
+import { TotalConfigurationPrice } from './TotalConfigurationPrice';
+import { useGetPriceFromFormValues } from './useGetPriceFromFormValues';
 
 const noOp = () => {};
 
@@ -17,6 +20,7 @@ export interface CategoryProductConfigurationFormProps {
 	onChange?: (productBreakdown: {
 		componentBreakdown: Record<string, string>;
 	}) => void;
+	onPriceChange?: (newPrice: number) => void;
 }
 
 export const CategoryProductConfiguration = memo(
@@ -24,6 +28,7 @@ export const CategoryProductConfiguration = memo(
 		configuration,
 		onSubmit = noOp,
 		onChange: _onChange,
+		onPriceChange = noOp,
 		formId = 'category-product-configuration-form',
 	}: CategoryProductConfigurationFormProps) {
 		// For demo, although server supports multi-unit per option, we wil assume a single unit
@@ -43,15 +48,26 @@ export const CategoryProductConfiguration = memo(
 
 		const methods = useForm({ defaultValues });
 
-		const onChange = useCallback(() => {
-			if (_onChange) {
-				_onChange(methods.getValues());
-			}
-		}, [methods.getValues, _onChange]);
-
 		const validator = useMemo(() => {
 			return new ProductBreakdownValidator(configuration, { sortRules: true });
 		}, [configuration]);
+
+		const lastPrice = useRef<number>();
+		const currentPrice = useGetPriceFromFormValues(
+			methods.getValues(),
+			validator,
+		);
+		if (lastPrice.current !== currentPrice && onPriceChange) {
+			onPriceChange(currentPrice);
+		}
+
+		const onChange = useCallback(() => {
+			const values = methods.getValues();
+
+			if (_onChange) {
+				_onChange(values);
+			}
+		}, [methods.getValues, _onChange]);
 
 		return (
 			<FormProvider {...methods}>
@@ -71,6 +87,9 @@ export const CategoryProductConfiguration = memo(
 							/>
 						);
 					})}
+					<ProductConfigurationActionBarExtraActionWrapper>
+						<TotalConfigurationPrice validator={validator} />
+					</ProductConfigurationActionBarExtraActionWrapper>
 				</form>
 			</FormProvider>
 		);

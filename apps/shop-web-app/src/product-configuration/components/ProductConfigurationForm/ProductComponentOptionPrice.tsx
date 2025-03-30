@@ -6,6 +6,7 @@ import {
 } from 'product-management-interfaces';
 import React, { memo, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+import { FormatPrice } from './FormatPrice';
 
 export interface ProductComponentOptionPriceProps {
 	componentOption: ComponentOption;
@@ -62,15 +63,12 @@ export const ProductComponentOptionPrice = memo(
 				result += supplements.get(otherProductOptionsId) ?? 0;
 			}
 
-			return Intl.NumberFormat('en', {
-				style: 'currency',
-				currency: 'EUR',
-			}).format(result);
+			return result;
 		}, [selectedOptions, supplements, componentOption]);
 
 		return (
 			<div className="shop-configuration-form-component-option-price">
-				{price}
+				<FormatPrice price={price} />
 			</div>
 		);
 	},

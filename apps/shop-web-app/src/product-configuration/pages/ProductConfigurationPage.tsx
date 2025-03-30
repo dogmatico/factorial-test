@@ -1,5 +1,5 @@
 import type { CategoryConfigurationRules } from 'product-management-interfaces';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { ProductConfigurationActionBar } from '../components/ProductConfigurationActionBar';
 import { CategoryProductConfiguration } from '../components/ProductConfigurationForm';
 
