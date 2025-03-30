@@ -6,6 +6,7 @@ import {
 	primaryKey,
 	sqliteTable,
 	sqliteView,
+	text,
 } from 'drizzle-orm/sqlite-core';
 
 import {
@@ -13,7 +14,7 @@ import {
 	productCategoryComponent,
 	productComponent,
 	productComponentOption,
-} from '../../product-management/models';
+} from '../../product-management/models/index.ts';
 
 // Inventory
 export const inventory = sqliteTable(
@@ -34,15 +35,15 @@ export const inventory = sqliteTable(
 export const inventoryReservation = sqliteTable(
 	'inventory_reservation',
 	{
-		sessionId: integer('session_id').notNull(),
+		sessionId: text('session_id', { length: 36 }).notNull(),
 		productComponentOptionId: integer('product_component_option_id')
 			.notNull()
 			.references(() => productComponentOption.id, { onDelete: 'cascade' }),
 		reservedUnits: integer('reserved_units').notNull(),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
-		expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+		expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
 	},
 	(table) => [
 		primaryKey({ columns: [table.sessionId, table.productComponentOptionId] }),
@@ -56,17 +57,17 @@ export const availableInventory = sqliteView('available_inventory').as((qb) => {
 	return qb
 		.select({
 			productComponentOptionId: inventory.productComponentOptionId,
-			totalStock:
-				sql<number>`FLOOR(1.10 * (${inventory.totalStock} - COALESCE(SUM(${inventoryReservation.reservedUnits}), 0)))`.as(
-					'total_stock',
-				),
-			productCategoryId: productCategory.id,
+			totalStock: sql<number>`
+						(CAST(1.10 * ${inventory.totalStock} AS INTEGER) - 
+						COALESCE(
+							(SELECT SUM(${inventoryReservation.reservedUnits}) 
+							FROM ${inventoryReservation} 
+							WHERE ${inventoryReservation.productComponentOptionId} = ${inventory.productComponentOptionId}
+							AND ${inventoryReservation.expiresAt} > (unixepoch('now') * 1000)
+						, 0)
+					`.as('total_stock'),
 		})
 		.from(inventory)
-		.leftJoin(
-			inventoryReservation,
-			sql`${inventory.productComponentOptionId} = ${inventoryReservation.productComponentOptionId} AND ${inventoryReservation.expiresAt} > datetime('now')`,
-		)
 		.innerJoin(
 			productComponentOption,
 			sql`${inventory.productComponentOptionId} = ${productComponentOption.id}`,
@@ -79,13 +80,5 @@ export const availableInventory = sqliteView('available_inventory').as((qb) => {
 			productCategoryComponent,
 			sql`${productComponent.id} = ${productCategoryComponent.productComponentId}`,
 		)
-		.innerJoin(
-			productCategory,
-			sql`${productCategoryComponent.productCategoryId} = ${productCategory.id}`,
-		)
-		.groupBy(
-			inventory.productComponentOptionId,
-			inventory.totalStock,
-			productCategory.id,
-		);
+		.groupBy(inventory.productComponentOptionId, inventory.totalStock);
 });

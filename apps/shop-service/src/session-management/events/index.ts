@@ -1,10 +1,12 @@
 export interface UserLoggedInEvent {
 	type: 'shop-service/session-management/USER_LOGGED_IN';
 	userId: string;
+	sessionId: string;
 }
 
 export function makeUserLoggedInEvent(payload: {
 	userId: string;
+	sessionId: string;
 }): UserLoggedInEvent {
 	return {
 		type: 'shop-service/session-management/USER_LOGGED_IN',

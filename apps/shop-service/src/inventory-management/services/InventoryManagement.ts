@@ -1,4 +1,4 @@
-import { inArray } from 'drizzle-orm';
+import { inArray, sql } from 'drizzle-orm';
 
 import {
 	type ProductConfigurationService,
@@ -9,7 +9,12 @@ import {
 	type DBConnection,
 	getDBConnection,
 } from '../../shared/connections/database.ts';
-import { availableInventory, inventory } from '../models/index.ts';
+import { toInt } from '../../shared/helpers/toInt.ts';
+import {
+	availableInventory,
+	inventory,
+	inventoryReservation,
+} from '../models/index.ts';
 
 export interface GetAvailableInventoryOptions {
 	/**
@@ -66,6 +71,66 @@ export class InventoryManagementService {
 		}, {});
 	}
 
+	async reserveInventoryForSession(
+		sessionId: string,
+		componentOptionsBreakdown: Record<string | number, number>,
+	) {
+		return this.#db.transaction(async (tx) => {
+			const availableUnit = this.#aggregateToInventoryObject(
+				await tx
+					.select()
+					.from(availableInventory)
+					.where(
+						inArray(
+							availableInventory.productComponentOptionId,
+							Object.keys(componentOptionsBreakdown).map((id) => toInt(id)),
+						),
+					),
+			);
+
+			const missingInventoryId: string[] = [];
+			for (const [id, requiredUnits] of Object.entries(
+				componentOptionsBreakdown,
+			)) {
+				if (availableUnit[id] < requiredUnits) {
+					missingInventoryId.push(id);
+				}
+			}
+
+			if (missingInventoryId.length) {
+				return { success: false };
+			}
+
+			// 12 minutes
+			const expiresAt = new Date(Date.now() + 12 * 1000 * 60);
+			// We don't have proper excluded at SQLite, so we will be adding one by one
+			for (const [productComponentOptionId, reservedUnits] of Object.entries(
+				componentOptionsBreakdown,
+			)) {
+				await tx
+					.insert(inventoryReservation)
+					.values({
+						createdAt: new Date(),
+						expiresAt,
+						sessionId,
+						productComponentOptionId: toInt(productComponentOptionId),
+						reservedUnits,
+					})
+					.onConflictDoUpdate({
+						target: [
+							inventoryReservation.sessionId,
+							inventoryReservation.productComponentOptionId,
+						],
+						set: {
+							reservedUnits: sql`${inventoryReservation.reservedUnits} + ${reservedUnits}`,
+						},
+					});
+			}
+
+			return { sucess: true };
+		});
+	}
+
 	constructor(
 		db: DBConnection,
 		productConfigurationService: ProductConfigurationService,
@@ -97,6 +162,21 @@ export class InventoryManagementService {
 					productOptionIds.map((id) => Number.parseInt(id, 10)),
 				),
 			);
+	}
+
+	#aggregateToInventoryObject(
+		rows: {
+			productComponentOptionId: number;
+			totalStock: number;
+			productCategoryId?: number;
+		}[],
+		maxUnits: number = Number.POSITIVE_INFINITY,
+	): Record<string, number> {
+		return rows.reduce((acc, curr) => {
+			acc[curr.productComponentOptionId] = Math.min(curr.totalStock, maxUnits);
+
+			return acc;
+		}, {});
 	}
 }
 

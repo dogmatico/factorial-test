@@ -8,6 +8,7 @@
 	"author": "Cristian Lorenzo i Martínez <cristian.lorenzo.martinez@gmail.com>",
 	"dependencies": {
 		"better-sqlite3": "11.9.1",
+		"body-parser": "2.2.0",
 		"cookie-session": "2.1.0",
 		"cors": "2.8.5",
 		"drizzle-orm": "0.41.0",

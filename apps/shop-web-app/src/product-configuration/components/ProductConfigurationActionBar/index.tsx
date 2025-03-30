@@ -1,7 +1,12 @@
-import React, { memo } from 'react';
+import React, { memo, type PropsWithChildren } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface ProductConfigurationActionBarProps {
 	formId?: string;
+}
+
+function makeExtraActionsOutletId(formId: string) {
+	return `${formId}__extra-actions-outlet`;
 }
 
 export const ProductConfigurationActionBar = memo(
@@ -10,6 +15,7 @@ export const ProductConfigurationActionBar = memo(
 	}: ProductConfigurationActionBarProps) {
 		return (
 			<footer className="shop-configuration-page-footer">
+				<div id={makeExtraActionsOutletId(formId)} />
 				<button
 					type="submit"
 					form={formId}
@@ -19,5 +25,15 @@ export const ProductConfigurationActionBar = memo(
 				</button>
 			</footer>
 		);
+	},
+);
+
+export const ProductConfigurationActionBarExtraActionWrapper = memo(
+	function ProductConfigurationActionBarExtraActionWrapper({
+		children,
+		formId = 'category-product-configuration-form',
+	}: PropsWithChildren<ProductConfigurationActionBarProps>) {
+		const host = document.getElementById(makeExtraActionsOutletId(formId));
+		return host ? createPortal(children, host) : null;
 	},
 );

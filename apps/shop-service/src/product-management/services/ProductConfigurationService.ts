@@ -10,19 +10,28 @@ import {
 	getDBConnection,
 } from '../../shared/connections/database.ts';
 
+import { toInt } from '../../shared/helpers/toInt.ts';
 import {
 	productCategory,
 	productCategoryComponent,
 	productComponent,
 	productComponentOption,
 	productComponentOptionRule,
+	productConfiguration,
+	productConfigurationComponentOption,
 } from '../models/index.ts';
-import { makeGlobalId } from '../utils/global-ids.ts';
+import { getLocalId, makeGlobalId } from '../utils/global-ids.ts';
 
 export type ProductCategoryIdentifier = Partial<{
 	id: string;
 	productName: string;
 }>;
+
+export interface UpsertCustomerConfigurationPayload {
+	configurationId: string;
+	productCategoryId: string;
+	componentBreakdown: Record<string, number>;
+}
 
 export class ProductConfigurationService {
 	#db: DBConnection;
@@ -67,7 +76,7 @@ export class ProductConfigurationService {
 			.where(
 				and(
 					id
-						? eq(productCategory.id, Number.parseInt(id, 10))
+						? eq(productCategory.id, Number.parseInt(getLocalId(id), 10))
 						: eq(productCategory.name, productName),
 					eq(productComponentOption.isActive, true),
 				),
@@ -83,7 +92,10 @@ export class ProductConfigurationService {
 
 			const result: CategoryConfigurationRules = {
 				category: {
-					id: queryResult[0].product_category.id.toString(),
+					id: makeGlobalId(
+						'ProductCategory',
+						queryResult[0].product_category.id.toString(),
+					),
 					name: queryResult[0].product_category.name,
 					description: queryResult[0].product_category.description ?? '',
 					productBreakDown: [],
@@ -184,6 +196,47 @@ export class ProductConfigurationService {
 
 		const validator = new ProductBreakdownValidator(config);
 		return validator.validateProductBreakdown(productComponentBreakdown);
+	}
+
+	async upsertCustomerConfiguration(
+		configuration: UpsertCustomerConfigurationPayload,
+	) {
+		// We will not be doing idempotence, as it will require to check the inventory
+		// differences to handle reservations. Skip for demo.
+		const configurationCheck = await this.avaluateProductConfigurationBreakdown(
+			{
+				id: configuration.productCategoryId,
+			},
+			configuration.componentBreakdown,
+		);
+
+		if (!configurationCheck.isValid) {
+			return { configurationId: null };
+		}
+
+		return this.#db.transaction(async (tx) => {
+			const [{ insertedId }] = await tx
+				.insert(productConfiguration)
+				.values({
+					name: '',
+					description: '',
+					productCategoryId: toInt(getLocalId(configuration.productCategoryId)),
+					isBaseConfiguration: false,
+				})
+				.returning({ insertedId: productConfiguration.id });
+
+			for (const [productComponentOptionId, quantity] of Object.entries(
+				configuration.componentBreakdown,
+			)) {
+				await tx.insert(productConfigurationComponentOption).values({
+					productConfigurationId: insertedId,
+					productComponentOptionId: toInt(getLocalId(productComponentOptionId)),
+					quantity,
+				});
+			}
+
+			return { configurationId: insertedId };
+		});
 	}
 }
 

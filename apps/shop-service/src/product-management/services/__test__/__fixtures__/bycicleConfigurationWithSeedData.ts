@@ -3,7 +3,7 @@ import { makeGlobalId } from '../../../utils/global-ids';
 
 export const bycicleConfigurationWithSeedData: CategoryConfigurationRules = {
 	category: {
-		id: '1',
+		id: makeGlobalId('ProductCategory', '1'),
 		name: 'Bicycles',
 		description: 'Fully customizable bicycles for all terrains',
 		productBreakDown: ['1', '2', '3', '4', '5'].map((dbId) =>

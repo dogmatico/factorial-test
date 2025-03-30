@@ -86,12 +86,12 @@ CREATE TABLE product_configuration (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(256),
   description TEXT,
-  product_component_id INT NOT NULL,
+  product_category_id INT NOT NULL,
 
   -- We can use it to differentiate customer from base configuration without duplicating tables
   is_base_configuration BOOLEAN NOT NULL DEFAULT FALSE,
 
-  FOREIGN KEY (product_component_id) REFERENCES product_component(id) ON DELETE CASCADE
+  FOREIGN KEY (product_category_id) REFERENCES product_category(id) ON DELETE CASCADE
 );
 
 -- Many to many relation
@@ -112,7 +112,7 @@ CREATE TABLE inventory (
 );
 
 CREATE TABLE inventory_reservation (
-  session_id INT NOT NULL,
+  session_id VARCHAR(36) NOT NULL,
   product_component_option_id INT NOT NULL,
   reserved_units INT NOT NULL CHECK (reserved_units >= 0),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -132,20 +132,17 @@ CREATE INDEX expires_at_idx ON inventory_reservation(expires_at);
 -- View to get available inventory
 CREATE VIEW available_inventory AS
 SELECT
-  inv_real.product_component_option_id,
-  -- Apply a default 10% overbooking
-  FLOOR(1.10 * (inv_real.total_stock - COALESCE(SUM(inv_reserved.reserved_units), 0))) as total_stock,
-  -- Consider the product_category_id to send less data and save prevent application layer filtering
-  pc.id
-FROM inventory inv_real
-LEFT JOIN inventory_reservation inv_reserved ON (
-  inv_real.product_component_option_id = inv_reserved.product_component_option_id
-  AND inv_reserved.expires_at > datetime('now')
-)
-JOIN product_component_option pco ON inv_real.product_component_option_id = pco.id
+  inv.product_component_option_id,
+  FLOOR(1.10 * inv.total_stock) - COALESCE(
+    (SELECT SUM(reserved_units) 
+     FROM inventory_reservation res 
+     WHERE res.product_component_option_id = inv.product_component_option_id
+     AND res.expires_at > unixepoch('now') * 1000),
+  0) AS total_stock
+FROM inventory inv
+JOIN product_component_option pco ON inv.product_component_option_id = pco.id
 JOIN product_component pc ON pco.product_component_id = pc.id
-JOIN product_category_component pcc ON pc.id = pcc.product_component_id
-GROUP BY inv_real.product_component_option_id, inv_real.total_stock, pc.id;
+JOIN product_category_component pcc ON pc.id = pcc.product_component_id;
 
 CREATE TABLE customer_order (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -153,6 +150,7 @@ CREATE TABLE customer_order (
   -- The service layer will use the session id as such. That means that we won't be adding a
   -- FOREIGN KEY. We will index it just to help
   customer_id INT NOT NULL,
+  session_id VARCHAR(36) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL,
   -- As in other cases, we use a constraint status to make it more portable
@@ -160,7 +158,9 @@ CREATE TABLE customer_order (
   total_price DECIMAL(10, 4)
 );
 
-CREATE INDEX customer_order_customer_id ON customer_order(customer_id);
+CREATE INDEX customer_order_customer_id_idx ON customer_order(customer_id);
+CREATE INDEX customer_order_session_id_status_idx ON customer_order(session_id, order_status);
+
 
 -- Codify Many to Many
 CREATE TABLE customer_order_configuration (

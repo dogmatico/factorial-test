@@ -76,7 +76,7 @@ INSERT INTO product_component_option_rule (product_component_option_id_1, produc
 -- SAMPLE BASE CONFIG
 
 -- Road Bike Configuration
-INSERT INTO product_configuration (name, description, product_component_id, is_base_configuration) VALUES
+INSERT INTO product_configuration (name, description, product_category_id, is_base_configuration) VALUES
   ('Standard Road Bike', 'Lightweight road bike configuration', 1, 1);
 
 INSERT INTO product_configuration_component_option (product_configuration_id, product_component_option_id, quantity) VALUES
@@ -87,7 +87,7 @@ INSERT INTO product_configuration_component_option (product_configuration_id, pr
   (1, 12, 1); -- Single-speed chain
 
 -- Mountain Bike Configuration
-INSERT INTO product_configuration (name, description, product_component_id, is_base_configuration) VALUES
+INSERT INTO product_configuration (name, description, product_category_id, is_base_configuration) VALUES
   ('Standard Mountain Bike', 'Durable mountain bike configuration', 1, 1);
 
 INSERT INTO product_configuration_component_option (product_configuration_id, product_component_option_id, quantity) VALUES
