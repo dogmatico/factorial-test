@@ -4,6 +4,7 @@ import {
 	type ProductConfigurationService,
 	getProductConfigurationService,
 } from '../../product-management/services/ProductConfigurationService.ts';
+import { getLocalId } from '../../product-management/utils/global-ids.ts';
 import {
 	type DBConnection,
 	getDBConnection,
@@ -54,7 +55,9 @@ export class InventoryManagementService {
 			);
 
 		const inventory = this.#getSessionAvailableInventory(
-			Object.keys(config?.componentOptions ?? {}),
+			Object.keys(config?.componentOptions ?? {}).map((globalId) =>
+				getLocalId(globalId),
+			),
 		);
 		return (await inventory).reduce((acc, curr) => {
 			acc[curr.productComponentOptionId] = Math.min(curr.totalStock, maxUnits);

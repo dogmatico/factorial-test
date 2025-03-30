@@ -1,1 +1,1 @@
-export type { APIResponse, APIError } from "./src/interfaces";
+export type { APIResponse, APIError } from './src/interfaces';

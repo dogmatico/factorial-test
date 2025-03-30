@@ -206,7 +206,7 @@ describe('CategoryProductConfiguration', () => {
 			expect(fieldsetLegend).toBeInTheDocument();
 
 			const descriptionField = document.getElementById(
-				fieldsetLegend.getAttribute('aria-describedby') as string,
+				fieldsetLegend.getAttribute('aria-describedby')?.split(' ')?.[0] as string,
 			);
 			expect(descriptionField).toHaveTextContent(
 				firstSectionComponentDefinition.description,
@@ -224,7 +224,7 @@ describe('CategoryProductConfiguration', () => {
 					firstSectionComponentDefinition.availableOptions[0]
 				];
 			const [firstOption] = options;
-			expect(firstOption).toHaveAccessibleName(optionConfig.name);
+			expect(firstOption).toHaveAccessibleName(`Full-suspension €130.00`);
 		});
 	});
 });

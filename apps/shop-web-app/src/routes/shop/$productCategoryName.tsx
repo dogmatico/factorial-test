@@ -1,11 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import React from 'react';
 import type { APIResponse } from 'base-api-interfaces';
-import { CategoryConfigurationRules } from 'product-management-interfaces';
+import type { CategoryConfigurationRules } from 'product-management-interfaces';
+import React from 'react';
 
 import { SERVER_BASE_URL } from '../../contants';
 import { ProductConfigurationPage } from '../../product-configuration/pages/ProductConfigurationPage';
-
 
 export const Route = createFileRoute('/shop/$productCategoryName')({
 	component: RouteComponent,
