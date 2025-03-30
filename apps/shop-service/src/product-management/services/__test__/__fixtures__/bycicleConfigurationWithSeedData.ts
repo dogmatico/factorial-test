@@ -1,4 +1,4 @@
-import type { CategoryConfigurationRules } from '../../../interfaces';
+import type { CategoryConfigurationRules } from 'product-management-interfaces';
 
 export const bycicleConfigurationWithSeedData: CategoryConfigurationRules = {
 	category: {

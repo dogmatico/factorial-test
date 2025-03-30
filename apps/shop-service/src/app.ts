@@ -12,6 +12,6 @@ setupInitSessionManagement(app);
 setupProductManagement(app);
 setupInventoryManagement(app);
 
-app.get('/', (_req, res) => {
+app.get('/status', (_req, res) => {
 	res.send({ message: 'Ready' });
 });

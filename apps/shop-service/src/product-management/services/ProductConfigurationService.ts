@@ -1,14 +1,15 @@
 import { and, asc, eq } from 'drizzle-orm';
-import {
-	type DBConnection,
-	getDBConnection,
-} from '../../shared/connections/database.ts';
 import type {
 	CategoryConfigurationRules,
 	ComponentOptionsRule,
 	ForbiddenComponentRule,
 	SupplementComponentRule,
-} from '../interfaces.ts';
+} from 'product-management-interfaces';
+import {
+	type DBConnection,
+	getDBConnection,
+} from '../../shared/connections/database.ts';
+
 import {
 	productCategory,
 	productCategoryComponent,

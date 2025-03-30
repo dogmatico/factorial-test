@@ -9,12 +9,15 @@
 	"dependencies": {
 		"better-sqlite3": "11.9.1",
 		"cookie-session": "2.1.0",
+		"cors": "2.8.5",
 		"drizzle-orm": "0.41.0",
-		"express": "5.0.1"
+		"express": "5.0.1",
+		"product-management-interfaces": "1.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/better-sqlite3": "7.6.12",
+		"@types/cors": "2.8.17",
 		"@types/express": "5.0.1",
 		"@types/node": "22.13.11",
 		"@types/supertest": "6.0.2",
