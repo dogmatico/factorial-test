@@ -2,33 +2,30 @@ import {
 	type CategoryConfigurationRules,
 	ProductBreakdownValidator,
 } from 'product-management-interfaces';
-import React, { memo, useCallback, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ProductConfigurationActionBarExtraActionWrapper } from '../ProductConfigurationActionBar';
 import { CategoryConfigurationComponentSection } from './CategoryConfigurationComponentSection';
 import { TotalConfigurationPrice } from './TotalConfigurationPrice';
-import { useGetPriceFromFormValues } from './useGetPriceFromFormValues';
 
 const noOp = () => {};
+
+export interface OnSubmitCategoryProductConfigurationFormPayload {
+	configurationId: string;
+	productCategoryId: string;
+	componentBreakdown: Record<string, number>;
+}
 
 export interface CategoryProductConfigurationFormProps {
 	configuration: CategoryConfigurationRules;
 	formId?: string;
-	onSubmit?: (productBreakdown: {
-		componentBreakdown: Record<string, string>;
-	}) => void;
-	onChange?: (productBreakdown: {
-		componentBreakdown: Record<string, string>;
-	}) => void;
-	onPriceChange?: (newPrice: number) => void;
+	onSubmit?: (payload: OnSubmitCategoryProductConfigurationFormPayload) => void;
 }
 
 export const CategoryProductConfiguration = memo(
 	function CategoryProductConfiguration({
 		configuration,
-		onSubmit = noOp,
-		onChange: _onChange,
-		onPriceChange = noOp,
+		onSubmit: _onSubmit = noOp,
 		formId = 'category-product-configuration-form',
 	}: CategoryProductConfigurationFormProps) {
 		// For demo, although server supports multi-unit per option, we wil assume a single unit
@@ -46,28 +43,30 @@ export const CategoryProductConfiguration = memo(
 			return value;
 		}, [configuration]);
 
+		const [configurationId] = useState<string>(() =>
+			globalThis.crypto.randomUUID(),
+		);
+
 		const methods = useForm({ defaultValues });
 
 		const validator = useMemo(() => {
 			return new ProductBreakdownValidator(configuration, { sortRules: true });
 		}, [configuration]);
 
-		const lastPrice = useRef<number>();
-		const currentPrice = useGetPriceFromFormValues(
-			methods.getValues(),
-			validator,
+		const onSubmit = useCallback(
+			(val: { componentBreakdown: Record<string, string> }) => {
+				const selectedOptionsBreakdown = Object.fromEntries(
+					Object.values(val.componentBreakdown).map((id) => [id, 1]),
+				);
+
+				_onSubmit({
+					configurationId,
+					componentBreakdown: selectedOptionsBreakdown,
+					productCategoryId: configuration.category.id,
+				});
+			},
+			[_onSubmit, configurationId, configuration.category.id],
 		);
-		if (lastPrice.current !== currentPrice && onPriceChange) {
-			onPriceChange(currentPrice);
-		}
-
-		const onChange = useCallback(() => {
-			const values = methods.getValues();
-
-			if (_onChange) {
-				_onChange(values);
-			}
-		}, [methods.getValues, _onChange]);
 
 		return (
 			<FormProvider {...methods}>
@@ -75,7 +74,6 @@ export const CategoryProductConfiguration = memo(
 					data-testid="category-product-configuration-form"
 					id={formId}
 					onSubmit={methods.handleSubmit(onSubmit)}
-					onChange={onChange}
 				>
 					{configuration.category.productBreakDown.map((componentId) => {
 						return (

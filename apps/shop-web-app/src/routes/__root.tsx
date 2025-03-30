@@ -30,6 +30,15 @@ function RootComponent() {
 				>
 					Buy a Bicycle
 				</Link>{' '}
+				<Link
+					to="/checkout"
+					className="shop-page-nav-bar-link"
+					activeProps={{
+						className: 'shop-page-nav-bar-link--active',
+					}}
+				>
+					Checkout
+				</Link>
 			</div>
 			<hr />
 			<Outlet />

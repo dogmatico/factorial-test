@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as CheckoutImport } from './routes/checkout'
 import { Route as IndexImport } from './routes/index'
 import { Route as ShopIndexImport } from './routes/shop/index'
 import { Route as ShopProductCategoryNameImport } from './routes/shop/$productCategoryName'
 
 // Create/Update Routes
+
+const CheckoutRoute = CheckoutImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutImport
+      parentRoute: typeof rootRoute
+    }
     '/shop/$productCategoryName': {
       id: '/shop/$productCategoryName'
       path: '/shop/$productCategoryName'
@@ -67,12 +81,14 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/shop/$productCategoryName': typeof ShopProductCategoryNameRoute
   '/shop': typeof ShopIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/shop/$productCategoryName': typeof ShopProductCategoryNameRoute
   '/shop': typeof ShopIndexRoute
 }
@@ -80,27 +96,30 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/shop/$productCategoryName': typeof ShopProductCategoryNameRoute
   '/shop/': typeof ShopIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/shop/$productCategoryName' | '/shop'
+  fullPaths: '/' | '/checkout' | '/shop/$productCategoryName' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/shop/$productCategoryName' | '/shop'
-  id: '__root__' | '/' | '/shop/$productCategoryName' | '/shop/'
+  to: '/' | '/checkout' | '/shop/$productCategoryName' | '/shop'
+  id: '__root__' | '/' | '/checkout' | '/shop/$productCategoryName' | '/shop/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutRoute: typeof CheckoutRoute
   ShopProductCategoryNameRoute: typeof ShopProductCategoryNameRoute
   ShopIndexRoute: typeof ShopIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutRoute: CheckoutRoute,
   ShopProductCategoryNameRoute: ShopProductCategoryNameRoute,
   ShopIndexRoute: ShopIndexRoute,
 }
@@ -116,12 +135,16 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/checkout",
         "/shop/$productCategoryName",
         "/shop/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/checkout": {
+      "filePath": "checkout.tsx"
     },
     "/shop/$productCategoryName": {
       "filePath": "shop/$productCategoryName.tsx"
