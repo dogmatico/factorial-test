@@ -1,5 +1,9 @@
 import type { CategoryConfigurationRules } from './interfaces';
-import { PreprocessRulesOptions, type PreprocessRulesResult, preprocessRules } from './preprocessRules';
+import {
+	type PreprocessRulesOptions,
+	type PreprocessRulesResult,
+	preprocessRules,
+} from './preprocessRules.ts';
 
 export class ProductBreakdownValidator {
 	#config: CategoryConfigurationRules;
@@ -9,7 +13,10 @@ export class ProductBreakdownValidator {
 	#componentOptionToComponent: Map<string, string>;
 	#requiredComponentCount: Map<string, number>;
 
-	constructor(config: CategoryConfigurationRules, options: PreprocessRulesOptions = {}) {
+	constructor(
+		config: CategoryConfigurationRules,
+		options: PreprocessRulesOptions = {},
+	) {
 		this.#config = config;
 
 		this.#rules = preprocessRules(this.#config, options);
@@ -19,6 +26,10 @@ export class ProductBreakdownValidator {
 
 	getRules(): PreprocessRulesResult {
 		return this.#rules;
+	}
+
+	getComponentOptionIdToComponentId(componentOptionId) {
+		return this.#componentOptionToComponent.get(componentOptionId);
 	}
 
 	validateProductBreakdown(productComponentBreakdown: Record<string, number>) {

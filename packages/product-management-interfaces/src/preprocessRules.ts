@@ -28,8 +28,10 @@ export function preprocessRules(
 		let counter = 0;
 		for (const productId of config.category.productBreakDown) {
 			for (const option1Id of config.components[productId].availableOptions) {
-				optionIdPosition.set(option1Id, counter++);
+				optionIdPosition.set(option1Id, counter);
 			}
+
+			counter++;
 		}
 	}
 
@@ -39,7 +41,8 @@ export function preprocessRules(
 	for (const rule of config.componentOptionsRules) {
 		let { option1Id, option2Id } = rule;
 		const option1Idx = optionIdPosition.get(option1Id) ?? 0;
-		const option2Idx = optionIdPosition.get(option1Id) ?? 0;
+		const option2Idx = optionIdPosition.get(option2Id) ?? 0;
+
 		if (option1Idx < option2Idx) {
 			[option2Id, option1Id] = [option1Id, option2Id];
 		}

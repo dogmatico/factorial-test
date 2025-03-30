@@ -6,10 +6,10 @@ export type {
 	ForbiddenComponentRule,
 	ProductCategory,
 	SupplementComponentRule,
-} from './src/interfaces';
+} from './src/interfaces.ts';
 export {
 	preprocessRules,
 	type PreprocessRulesResult,
 	type PreprocessRulesOptions,
-} from './src/preprocessRules';
-export { ProductBreakdownValidator } from './src/ProductBreakdownValidator';
+} from './src/preprocessRules.ts';
+export { ProductBreakdownValidator } from './src/ProductBreakdownValidator.ts';
