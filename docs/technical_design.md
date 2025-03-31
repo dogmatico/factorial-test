@@ -780,20 +780,17 @@ virtual. For now, we use a virtual view with a default 10% overbooking:
 ```sql
 CREATE VIEW available_inventory AS
   SELECT
-    inv_real.product_component_option_id,
-    -- Apply a default 10% overbooking
-    FLOOR(1.10 * (inv_real.total_stock - COALESCE(SUM(inv_reserved.reserved_units), 0))) as total_stock,
-    -- Consider the product_category_id to send less data and save prevent application layer filtering
-    pc.product_category_id
-  FROM inventory inv_real
-  LEFT JOIN inventory_reservation inv_reserved ON (
-    inv_real.product_component_option_id = inv_reserved.product_component_option_id
-    AND inv_reserved.expires_at > datetime('now')
-  )
-  JOIN product_component_option pco ON inv_real.product_component_option_id = pco.id
+    inv.product_component_option_id,
+    FLOOR(1.10 * inv.total_stock) - COALESCE(
+      (SELECT SUM(reserved_units) 
+      FROM inventory_reservation res 
+      WHERE res.product_component_option_id = inv.product_component_option_id
+      AND res.expires_at > unixepoch('now') * 1000),
+    0) AS total_stock
+  FROM inventory inv
+  JOIN product_component_option pco ON inv.product_component_option_id = pco.id
   JOIN product_component pc ON pco.product_component_id = pc.id
-  JOIN product_category_component pcc ON pc.id = pcc.product_component_id
-  GROUP BY inv_real.product_component_option_id, inv_real.total_stock, pc.product_category_id;
+  JOIN product_category_component pcc ON pc.id = pcc.product_component_id;
 ```
 
 In addition to the built-in release of the reserved units on session expiration, we need a cron task

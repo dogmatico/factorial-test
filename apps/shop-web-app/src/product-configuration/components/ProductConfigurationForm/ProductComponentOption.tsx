@@ -1,5 +1,5 @@
+import cx from 'classnames';
 import type {
-	CategoryConfigurationRules,
 	ComponentOption,
 	ProductBreakdownValidator,
 	Component as ProductComponent,
@@ -12,12 +12,14 @@ export interface ProductComponentOptionProps {
 	componentOption: ComponentOption;
 	component: ProductComponent;
 	validator: ProductBreakdownValidator;
+	availableInventory: Record<string, number>;
 }
 
 export const ProductComponentOption = memo(function ProductComponentOption({
 	componentOption,
 	component,
 	validator,
+	availableInventory,
 }: ProductComponentOptionProps) {
 	const optionDescriptionId = useId();
 
@@ -25,6 +27,8 @@ export const ProductComponentOption = memo(function ProductComponentOption({
 
 	const optionRules =
 		validator.getRules().forbiddenRules.get(componentOption.id) ?? null;
+
+	const isOutOfStock = (availableInventory?.[componentOption.id] ?? 0) === 0;
 
 	const rules = useMemo(() => {
 		if (optionRules) {
@@ -35,6 +39,10 @@ export const ProductComponentOption = memo(function ProductComponentOption({
 
 			return {
 				validate: (value, formValues) => {
+					if (value === componentOption.id && isOutOfStock) {
+						return 'Out of stock';
+					}
+
 					for (const selectedOptionId of Object.values(
 						formValues.componentBreakdown,
 					) as string[]) {
@@ -50,15 +58,20 @@ export const ProductComponentOption = memo(function ProductComponentOption({
 		}
 
 		return {};
-	}, [optionRules, componentOption.id]);
+	}, [optionRules, componentOption.id, isOutOfStock]);
 
 	return (
-		<div className="shop-configuration-form-component-option">
+		<div
+			className={cx('shop-configuration-form-component-option', {
+				'shop-configuration-form-component-option--out_of_stock': isOutOfStock,
+			})}
+		>
 			<label>
 				<input
 					type="radio"
 					value={componentOption.id}
 					aria-describedby={optionDescriptionId}
+					disabled={(availableInventory?.[componentOption.id] ?? 0) === 0}
 					{...register(`componentBreakdown.${component.id}`, rules)}
 				/>
 
