@@ -3,14 +3,11 @@ import type { Request, Response } from 'express';
 import { getInventoryManagementService } from '../../inventory-management/services/InventoryManagement.ts';
 import { getProductConfigurationService } from '../../product-management/services/ProductConfigurationService.ts';
 import { getLocalId } from '../../product-management/utils/global-ids.ts';
-import {
-	getDBConnection,
-	getNativeDatabase,
-} from '../../shared/connections/database.ts';
+import { getDBConnection } from '../../shared/connections/database.ts';
 import { toInt } from '../../shared/helpers/toInt.ts';
 import { getOrderManagementService } from '../services/OrderManagementService.ts';
 
-export async function upsertConfigurationToSessionOrder(
+export async function upsertConfigurationToSessionOrderController(
 	req: Request,
 	res: Response,
 ) {

@@ -1,4 +1,9 @@
-import { sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
+import {
+	productComponentOption,
+	productConfiguration,
+	productConfigurationComponentOption,
+} from '../../product-management/models/index.ts';
 import {
 	type DBConnection,
 	getDBConnection,
@@ -52,6 +57,60 @@ export class OrderManagementService {
 					},
 				}),
 		);
+	}
+
+	async getSessionOrder(sessionId: string, customerId: number) {
+		const rows = await this.#db
+			.select()
+			.from(customerOrder)
+			.leftJoin(
+				customerOrderConfiguration,
+				eq(customerOrder.id, customerOrderConfiguration.customerOrderId),
+			)
+			.innerJoin(
+				productConfiguration,
+				eq(
+					customerOrderConfiguration.productConfigurationId,
+					productConfiguration.id,
+				),
+			)
+			.leftJoin(
+				productConfigurationComponentOption,
+				eq(
+					productConfiguration.id,
+					productConfigurationComponentOption.productConfigurationId,
+				),
+			)
+			.leftJoin(
+				productComponentOption,
+				eq(
+					productConfigurationComponentOption.productComponentOptionId,
+					productComponentOption.id,
+				),
+			)
+			.where(
+				and(
+					eq(customerOrder.sessionId, sessionId),
+					eq(customerOrder.customerId, customerId),
+				),
+			);
+
+		const result = {
+			configurations: {},
+		};
+		for (const row of rows) {
+			if (!result.configurations[row.product_configuration.id]) {
+				result.configurations[row.product_configuration.id] = {
+					components: [],
+				};
+			}
+
+			result.configurations[row.product_configuration.id].components.push({
+				name: row.product_component_option?.name,
+			});
+		}
+
+		return result;
 	}
 }
 

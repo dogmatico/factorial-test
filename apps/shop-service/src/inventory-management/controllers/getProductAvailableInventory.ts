@@ -1,6 +1,7 @@
 import type { APIResponse } from 'base-api-interfaces';
 import type { Request, Response } from 'express';
 
+import { makeGlobalId } from '../../product-management/utils/global-ids.ts';
 import { getInventoryManagementService } from '../services/InventoryManagement.ts';
 
 export async function getProductAvailableInventory(
@@ -10,7 +11,7 @@ export async function getProductAvailableInventory(
 	const productName = req.params.productName;
 
 	const inventoryManagementService = getInventoryManagementService();
-	const configuration =
+	const availableInventory =
 		await inventoryManagementService.getSessionInventoryForProductOptions(
 			{ productName },
 			req.session?.userId ?? '',
@@ -19,7 +20,12 @@ export async function getProductAvailableInventory(
 
 	const responsePayload: APIResponse<Record<string, number>> = {
 		isSuccess: true,
-		data: configuration,
+		data: Object.fromEntries(
+			Object.entries(availableInventory).map(([id, units]) => [
+				makeGlobalId('ComponentOption', id),
+				units,
+			]),
+		),
 		errors: [],
 		warnings: [],
 	};

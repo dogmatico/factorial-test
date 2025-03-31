@@ -58,8 +58,8 @@ INSERT INTO product_category_component (product_category_id, product_component_i
 INSERT INTO inventory (product_component_option_id, total_stock) VALUES
   (1, 10), (2, 15), (3, 8),    -- Frame types
   (4, 20), (5, 20),            -- Frame finishes
-  (6, 12), (7, 5), (8, 3),     -- Wheels (fat bike wheels low stock)
-  (9, 0), (10, 25), (11, 25),  -- Rim colors (red out of stock)
+  (6, 12), (7, 0), (8, 3),     -- Wheels (fat bike wheels low stock)
+  (9, 2), (10, 25), (11, 25),  -- Rim colors (red out of stock)
   (12, 30), (13, 30);          -- Chains
 
 -- COMPATBILITY/SUPPLEMENTS

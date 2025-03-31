@@ -2,7 +2,7 @@ import { type Express, Router } from 'express';
 
 import { getProductAvailableInventory } from './getProductAvailableInventory.ts';
 
-export function setupProductManagementControllers(app: Express) {
+export function setupInventoryManagementControllers(app: Express) {
 	const router = Router();
 
 	router.get(
