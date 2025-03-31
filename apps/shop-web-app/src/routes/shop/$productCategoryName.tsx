@@ -10,15 +10,30 @@ export const Route = createFileRoute('/shop/$productCategoryName')({
 	component: RouteComponent,
 	loader: ({
 		params: { productCategoryName },
-	}): APIResponse<CategoryConfigurationRules> => {
-		return fetch(
-			`${SERVER_BASE_URL}/api/v1/shop/category/${productCategoryName}`,
-		).then((res) => res.json());
+	}): Promise<
+		[
+			APIResponse<Record<string, number>>,
+			APIResponse<CategoryConfigurationRules>,
+		]
+	> => {
+		return Promise.all([
+			fetch(
+				`${SERVER_BASE_URL}/api/v1/shop/category/${productCategoryName}/available_inventory`,
+			).then((res) => res.json()),
+			fetch(
+				`${SERVER_BASE_URL}/api/v1/shop/category/${productCategoryName}`,
+			).then((res) => res.json()),
+		]);
 	},
 });
 
 function RouteComponent() {
-	const { data } = Route.useLoaderData();
+	const [inventoryData, configData] = Route.useLoaderData();
 
-	return <ProductConfigurationPage configuration={data} />;
+	return (
+		<ProductConfigurationPage
+			configuration={configData.data}
+			availableInventory={inventoryData.data}
+		/>
+	);
 }

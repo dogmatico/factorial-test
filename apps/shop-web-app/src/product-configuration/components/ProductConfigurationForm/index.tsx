@@ -18,6 +18,7 @@ export interface OnSubmitCategoryProductConfigurationFormPayload {
 
 export interface CategoryProductConfigurationFormProps {
 	configuration: CategoryConfigurationRules;
+	availableInventory: Record<string, number>;
 	formId?: string;
 	onSubmit?: (payload: OnSubmitCategoryProductConfigurationFormPayload) => void;
 }
@@ -25,6 +26,7 @@ export interface CategoryProductConfigurationFormProps {
 export const CategoryProductConfiguration = memo(
 	function CategoryProductConfiguration({
 		configuration,
+		availableInventory,
 		onSubmit: _onSubmit = noOp,
 		formId = 'category-product-configuration-form',
 	}: CategoryProductConfigurationFormProps) {
@@ -81,6 +83,7 @@ export const CategoryProductConfiguration = memo(
 								key={componentId}
 								componentId={componentId}
 								configuration={configuration}
+								availableInventory={availableInventory}
 								validator={validator}
 							/>
 						);

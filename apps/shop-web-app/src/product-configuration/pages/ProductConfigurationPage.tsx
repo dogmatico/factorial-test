@@ -11,10 +11,12 @@ import {
 
 export interface CategoryProductConfigurationFormProps {
 	configuration: CategoryConfigurationRules | null;
+	availableInventory: Record<string, number>;
 }
 
 export const ProductConfigurationPage = memo(function ProductConfigurationPage({
 	configuration,
+	availableInventory,
 }: CategoryProductConfigurationFormProps) {
 	const navigate = useNavigate();
 
@@ -49,6 +51,7 @@ export const ProductConfigurationPage = memo(function ProductConfigurationPage({
 				<section className="shop-configuration-page-section--config-form">
 					<CategoryProductConfiguration
 						configuration={configuration}
+						availableInventory={availableInventory}
 						onSubmit={onSubmit}
 					/>
 				</section>

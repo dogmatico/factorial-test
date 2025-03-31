@@ -10,6 +10,7 @@ export interface CategoryConfigurationComponentSectionProps {
 	componentId: string;
 	configuration: CategoryConfigurationRules;
 	validator: ProductBreakdownValidator;
+	availableInventory: Record<string, number>;
 }
 
 export const CategoryConfigurationComponentSection = memo(
@@ -17,6 +18,7 @@ export const CategoryConfigurationComponentSection = memo(
 		componentId,
 		configuration,
 		validator,
+		availableInventory,
 	}: CategoryConfigurationComponentSectionProps) {
 		const productConfig = configuration.components[componentId];
 
@@ -47,6 +49,7 @@ export const CategoryConfigurationComponentSection = memo(
 							<ProductComponentOption
 								key={optionId}
 								componentOption={componentOption}
+								availableInventory={availableInventory}
 								component={productConfig}
 								validator={validator}
 							/>
